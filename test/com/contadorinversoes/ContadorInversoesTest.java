@@ -14,6 +14,5 @@ public class ContadorInversoesTest {
 		long totalInversoes = contador.contarInversoes(a);
 		
 		assertEquals(5, totalInversoes);
-		
 	}
 }
