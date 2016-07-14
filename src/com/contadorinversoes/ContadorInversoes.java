@@ -4,61 +4,48 @@
 
 package com.contadorinversoes;
 
+import com.contadorinversoes.excecoes.ArrayVazioException;
+
 public class ContadorInversoes {
 
-	public long contarInversoes(int[] a) {
-		return mergeSort(a, 0, a.length - 1);
+	public long contaInversoes(int[] a) throws ArrayVazioException {
+		trataExcecoes(a);
+		return divideArray(a, 0, a.length - 1);
 	}
 
-	long mergeSort(int a[], int esquerda, int direita) { //Função que divide o array
-		int metade;
-		long cont = 0; //Variável 'cont' responsável por contar as inversões 
-
-		if (esquerda < direita) {
-			metade = (esquerda + direita) / 2;
-			cont = mergeSort(a, esquerda, metade);
-			cont += mergeSort(a, metade + 1, direita);
-			cont += merge(a, esquerda, metade + 1, direita);
+	private void trataExcecoes(int[] a) throws ArrayVazioException {
+		if (a.length == 0) {
+			throw new ArrayVazioException("Erro: Array vazio.");
 		}
-
-		return cont;
 	}
 
-	static long merge(int a[], int esquerda, int metade, int direita) { //Função que ordena o array, intercalando as posições
-		int tamanho = direita - esquerda + 1;
-		int[] temp = new int[tamanho];
+	long divideArray(int a[], int esquerda, int direita) { //Função que divide o array 
+		if (esquerda < direita) {
+			int metade = (esquerda + direita) / 2;
+			return divideArray(a, esquerda, metade) 
+					+ divideArray(a, metade + 1, direita) + intercalaEOrdenaArray(a, esquerda, metade + 1, direita);
+		} else {
+			return 0;
+		}
+	}
+
+	static long intercalaEOrdenaArray(int a[], int esquerda, int metade, int direita) { //Função que intercalando as posições e ordena o array
 		int i = 0, j = esquerda, k = metade;
+		int[] temp = new int[direita - esquerda + 1];
 		long cont = 0;
 
 		while (j <= metade - 1 && k <= direita) {
 			if (a[j] <= a[k]) {
-				temp[i] = a[j];
-				i++;
-				j++;
+				temp[i++] = a[j++];
 			} else {
-				temp[i] = a[k];
-				cont += metade - j; // Conta quantas posições foram deslocadas, soma com 'cont' e retorna para o mesmo
-				i++;
-				k++;
+				temp[i++] = a[k++];
+				cont += metade - j; // Conta quantas posições foram deslocadas
 			}
 		}
-		while (j <= metade - 1) {
-			temp[i] = a[j];
-			i++;
-			j++;
-		}
-		while (k <= direita) {
-			temp[i] = a[k];
-			i++;
-			k++;
-		}
-		i = 0;
-		while (esquerda <= direita) {
-			a[esquerda] = temp[i];
-			esquerda++;
-			i++;
-		}
-
+		while (j <= metade - 1) temp[i++] = a[j++];
+		while (k <= direita) temp[i++] = a[k++];
+		for (int t : temp) a[esquerda++] = t;
+		
 		return cont;
 	}
 }
